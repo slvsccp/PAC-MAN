@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+char mapa[5] [10+1];
+int linhas;
+int colunas;
+
 int main() {
-    //matriz de 5 x 10;
-    char mapa[5] [10+1];
 
     FILE* f;
     f = fopen("mapa.txt", "r");
