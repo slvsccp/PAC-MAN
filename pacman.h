@@ -1,3 +1,4 @@
+/*
 void liberamapa();
 void lemapa();
 void alocamapa();
@@ -12,3 +13,5 @@ struct mapa {
 };
 
 typedef struct mapa MAPA;
+
+*/
