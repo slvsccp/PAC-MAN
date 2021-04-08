@@ -6,6 +6,7 @@
 
 MAPA m;
 POSICAO heroi;
+int tempilula = 0;
 
 int acabou()
 {
@@ -53,6 +54,10 @@ void move(char direcao)
     if (!podeandar(&m, HEROI, proximox, proximoy))
         return;
 
+    if(ehpersonagem(&m, PIPULA, proximox, proximoy)) {
+        tempilula = 1;
+    }
+
     andanomapa(&m, heroi.x, heroi.y, proximox, proximoy);
     heroi.x = proximox;
     heroi.y = proximoy;
@@ -92,25 +97,53 @@ void fantasmas()
 
     for (int i = 0; i < copia.linhas; i++)
     {
-        for (int j = 0; j < copia.colunas; j++)
+    for (int j = 0; j < copia.colunas; j++)
+    {
+        if (copia.matriz[i][j] == FANTASMA)
+    {
+        int xdestino;
+        int ydestino;
+
+        int encontrou = praondefantasmavai(i, j, &xdestino, &ydestino);
+
+        if (encontrou)
         {
-            if (copia.matriz[i][j] == FANTASMA)
-            {
-
-                int xdestino;
-                int ydestino;
-
-                int encontrou = praondefantasmavai(i, j, &xdestino, &ydestino);
-
-                if (encontrou)
-                {
-                    andanomapa(&m, i, j, xdestino, ydestino);
-                }
+            andanomapa(&m, i, j, xdestino, ydestino);
             }
         }
     }
+}
 
     liberamapa(&copia);
+}
+
+void explodepipula() {
+
+    if(!tempilula) return;
+
+    explodepipula2(heroi.x, heroi.y, 0, 1, 3);
+    explodepipula2(heroi.x, heroi.y, 0, -1, 3);
+
+    explodepipula2(heroi.x, heroi.y, 1, 0, 3);
+    explodepipula2(heroi.x, heroi.y, -1, 0, 3);
+
+    tempilula = 0;
+}
+
+void explodepipula2(int x, int y, int somax, int somay, int qtd) {
+
+    if(qtd == 0) return;
+
+    int novox = x + somax;
+    int novoy = y + somay;
+
+
+    if(!ehvalida(&m, novox, novoy)) return;
+    if(ehparede(&m, novox, novoy)) return;
+
+    m.matriz[novox][novoy] = VAZIO;
+    explodepipula(novox, novoy, somax, somay, qtd - 1);
+
 }
 
 int main()
@@ -121,12 +154,15 @@ int main()
 
     do
     {
+        printf("Tem pipula: %s\n", (tempilula ? "SIM" : "NAO"));
         imprimemapa(&m);
 
         char comando;
         scanf(" %c", &comando);
 
         move(comando);
+        if(comando == BOMBA) explodepipula();
+
         fantasmas();
 
     } while (!acabou());
